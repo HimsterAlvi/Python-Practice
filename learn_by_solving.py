@@ -276,7 +276,7 @@ def main() -> None:
                     print(f"    Expected (contains): {exp[:80]}")
                     print(f"    Got:                {got[:80]}")
             if all_ok:
-                print("  All tests passed. Run code_checker next (c {}).".format(num))
+                print(f"  All tests passed. Run code_checker next (c {num}).")
             continue
 
         # Show problem by number

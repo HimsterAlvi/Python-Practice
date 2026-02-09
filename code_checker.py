@@ -3,6 +3,19 @@
 code_checker.py — Run your practice scripts through this to get feedback on
 how to improve and where you might be messing up. Use the output to fix code
 or to ask Cursor for help at specific lines.
+
+How to use:
+  From the project folder (Python-Practice):
+
+  1. Check one or more files:
+     python code_checker.py solution_1.py
+     python code_checker.py problem#1.py solution_2.py
+
+  2. Check all Python files in the current directory (except this script):
+     python code_checker.py
+
+  You can also run it via learn_by_solving.py: type "c 1" (or "c 1 problem#1.py")
+  to run the checker on your solution for problem 1.
 """
 
 import ast
@@ -15,7 +28,7 @@ def read_file(path: Path) -> str:
     """Read file contents; return empty string on error."""
     try:
         return path.read_text(encoding="utf-8")
-    except Exception as e:
+    except Exception:
         return ""
 
 
@@ -30,11 +43,13 @@ def check_syntax(path: Path, source: str) -> list[dict]:
     try:
         ast.parse(source)
     except SyntaxError as e:
-        issues.append({
-            "line": e.lineno or 0,
-            "message": f"Syntax error: {e.msg}",
-            "severity": "error",
-        })
+        issues.append(
+            {
+                "line": e.lineno or 0,
+                "message": f"Syntax error: {e.msg}",
+                "severity": "error",
+            }
+        )
     return issues
 
 
@@ -72,11 +87,13 @@ def check_while_break(source: str) -> list[dict]:
                 continue
             if "break" in stripped and "if " not in lines[max(0, i - 2) : i + 1]:
                 # Simple heuristic: break very soon after while with no preceding if
-                issues.append({
-                    "line": i,
-                    "message": "break right after 'while' often makes the loop run only once. Use break only when a condition is met (e.g. valid input). See CODING_REFERENCE.md.",
-                    "severity": "warning",
-                })
+                issues.append(
+                    {
+                        "line": i,
+                        "message": "break right after 'while' often makes the loop run only once. Use break only when a condition is met (e.g. valid input). See CODING_REFERENCE.md.",
+                        "severity": "warning",
+                    }
+                )
                 in_while = False
     return issues
 
@@ -96,7 +113,19 @@ def check_global_usage_in_functions(tree: ast.AST, source: str, path: Path) -> l
             args = [a.arg for a in node.args.args]
             # Common mistake: name like file_name used but not in args
             for name in used:
-                if name in ("self", "True", "False", "None", "print", "range", "len", "str", "int", "float", "input"):
+                if name in (
+                    "self",
+                    "True",
+                    "False",
+                    "None",
+                    "print",
+                    "range",
+                    "len",
+                    "str",
+                    "int",
+                    "float",
+                    "input",
+                ):
                     continue
                 if name in args:
                     continue
@@ -104,11 +133,13 @@ def check_global_usage_in_functions(tree: ast.AST, source: str, path: Path) -> l
                     # Could be a global; suggest passing as argument
                     for line_no in range(node.lineno, node.end_lineno or node.lineno + 1):
                         if line_no <= len(lines) and name in lines[line_no - 1]:
-                            issues.append({
-                                "line": line_no,
-                                "message": f"Function uses '{name}' but it's not a parameter. Prefer passing it as an argument (see CODING_REFERENCE.md).",
-                                "severity": "warning",
-                            })
+                            issues.append(
+                                {
+                                    "line": line_no,
+                                    "message": f"Function uses '{name}' but it's not a parameter. Prefer passing it as an argument (see CODING_REFERENCE.md).",
+                                    "severity": "warning",
+                                }
+                            )
                             break
     return issues
 
@@ -124,11 +155,13 @@ def check_print_vs_return(tree: ast.AST, source: str) -> list[dict]:
             )
             has_return = any(isinstance(n, ast.Return) for n in ast.walk(node))
             if has_print and not has_return and node.name != "__init__":
-                issues.append({
-                    "line": node.lineno,
-                    "message": "Consider returning a value from this function and letting the caller print (makes code easier to test). See CODING_REFERENCE.md.",
-                    "severity": "suggestion",
-                })
+                issues.append(
+                    {
+                        "line": node.lineno,
+                        "message": "Consider returning a value from this function and letting the caller print (makes code easier to test). See CODING_REFERENCE.md.",
+                        "severity": "suggestion",
+                    }
+                )
     return issues
 
 
@@ -137,11 +170,13 @@ def check_repr_usage(source: str) -> list[dict]:
     issues = []
     for i, line in enumerate(source.splitlines(), start=1):
         if "repr(" in line and "print" in line:
-            issues.append({
-                "line": i,
-                "message": "For user-facing output, str() is usually better than repr(). Use repr() for debugging. See CODING_REFERENCE.md.",
-                "severity": "suggestion",
-            })
+            issues.append(
+                {
+                    "line": i,
+                    "message": "For user-facing output, str() is usually better than repr(). Use repr() for debugging. See CODING_REFERENCE.md.",
+                    "severity": "suggestion",
+                }
+            )
     return issues
 
 
@@ -186,7 +221,9 @@ def report(path: Path, issues: list[dict], lines: list[str]) -> None:
     print()
     print("How to use this with Cursor:")
     print("  1. Open this file in Cursor and go to the line number(s) above.")
-    print("  2. Ask Cursor: 'Fix the issue at line N' or 'Apply the rule from CODING_REFERENCE.md here'.")
+    print(
+        "  2. Ask Cursor: 'Fix the issue at line N' or 'Apply the rule from CODING_REFERENCE.md here'."
+    )
     print("  3. Update CODING_REFERENCE.md -> 'My Problems' with what you learned.")
     print("=" * 60)
 
