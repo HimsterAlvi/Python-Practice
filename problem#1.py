@@ -1,7 +1,7 @@
 """
 Name: Hammad Alvi
 
-Problem#1: 
+Problem#1:
 Topic: if / else
 Difficulty: ★☆☆
 
