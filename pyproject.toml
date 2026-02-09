@@ -1,0 +1,30 @@
+[project]
+name = "python-practice"
+version = "0.1.0"
+description = "Practice problems for learning Python"
+readme = "PRACTICE_PROBLEMS.md"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+indent-width = 4
+exclude = ["venv", ".venv", "env", ".git", "__pycache__"]
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "F",      # Pyflakes
+    "I",      # isort (import sorting)
+    "N",      # pep8-naming
+    "W",      # pycodestyle warnings
+    "UP",     # pyupgrade
+    "B",      # flake8-bugbear
+    "C4",     # flake8-comprehensions
+]
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
